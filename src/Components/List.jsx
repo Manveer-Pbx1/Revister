@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
-import { SiLeetcode } from "react-icons/si";
 
 export default function List() {
   const [items, setItems] = useState([]);
@@ -8,6 +7,7 @@ export default function List() {
     name: "",
     url: "",
     notes: "",
+    difficulty: "",
     completed: false,
     saved: false,
   });
@@ -20,6 +20,7 @@ export default function List() {
       name: "",
       url: "",
       notes: "",
+      difficulty: "",
       completed: false,
       saved: false,
     });
@@ -55,17 +56,17 @@ export default function List() {
         />
       );
     } else if (url.includes("geeksforgeeks")) {
-      return <img src="https://img.icons8.com/color/480w/GeeksforGeeks.png" />;
+      return <img src="https://img.icons8.com/color/480w/GeeksforGeeks.png" alt="GeeksforGeeks Icon"/>;
     } else if (url.includes("codechef")) {
-      return <img  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyjpdztXS6-ldj8Njcp1wfOYNGka-Y-1OnBw&s" />;
+      return <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyjpdztXS6-ldj8Njcp1wfOYNGka-Y-1OnBw&s" alt="CodeChef Icon"/>;
+    } else if (url.includes("codeforces")) {
+      return <img src="https://cdn.iconscout.com/icon/free/png-256/free-code-forces-3629285-3031869.png?f=webp&w=256" alt="Codeforces Icon"/>;
+    } else if (url.includes("hackerrank")) {
+      return <img src="https://upload.wikimedia.org/wikipedia/commons/6/65/HackerRank_logo.png" alt="HackerRank Icon"/>;
     }
-    else if(url.includes("codeforces")){
-        return <img src="https://cdn.iconscout.com/icon/free/png-256/free-code-forces-3629285-3031869.png?f=webp&w=256"/>
-    }
-    else if(url.includes("hackerrank")){
-        return <img src="https://upload.wikimedia.org/wikipedia/commons/6/65/HackerRank_logo.png"/>
-    }
+    return null;
   };
+
   return (
     <div className="flex justify-center items-center flex-col">
       {!initialDivHidden && (
@@ -84,7 +85,7 @@ export default function List() {
         (item) =>
           !item.completed && (
             <div key={item.id} className="border-2 rounded p-2 w-[750px] mb-2">
-              <div className=" h-6 w-6 relative right-[25px] bottom-[25px] -rotate-45">
+              <div className="h-6 w-6 relative right-[25px] bottom-[25px] -rotate-45">
                 <a href={item.url} target="_blank" rel="noopener noreferrer">
                   {getIcon(item.url)}
                 </a>
@@ -93,6 +94,13 @@ export default function List() {
                 <>
                   <p className="text-xl font-semibold -translate-y-7">
                     {item.name}
+                    <span className={
+                      item.difficulty === "Easy" ? "text-green-600 px-4 text-sm bg-green-100 rounded-full p-2 ml-5" :
+                      item.difficulty === "Medium" ? "text-yellow-600 text-sm bg-yellow-100 rounded-full p-2 px-4 ml-5" :
+                      "text-red-600 text-sm bg-red-100 rounded-full p-2 px-4 ml-5"
+                    }>
+                      {item.difficulty}
+                    </span>
                   </p>
                   <p className="text-lg translate-x-2 h-[80px] overflow-y-auto ">
                     {item.notes}
@@ -133,8 +141,37 @@ export default function List() {
                       updateItem(item.id, "notes", e.target.value)
                     }
                     placeholder="Notes"
-                    className="border p-1 w-full"
+                    className="border p-1 w-full mb-2"
                   />
+                  <div className="text-lg space-x-3 mb-2">
+                    <input 
+                      type="radio" 
+                      className="h-4 w-4" 
+                      name={`difficulty-${item.id}`} 
+                      value="Easy" 
+                      checked={item.difficulty === "Easy"}
+                      onChange={(e) => updateItem(item.id, "difficulty", e.target.value)}
+                    />
+                    <label className="text-green-600 font-semibold">Easy</label>
+                    <input 
+                      type="radio" 
+                      className="h-4 w-4" 
+                      name={`difficulty-${item.id}`} 
+                      value="Medium" 
+                      checked={item.difficulty === "Medium"}
+                      onChange={(e) => updateItem(item.id, "difficulty", e.target.value)}
+                    />
+                    <label className="text-yellow-600 font-semibold">Medium</label>
+                    <input 
+                      type="radio" 
+                      className="h-4 w-4" 
+                      name={`difficulty-${item.id}`} 
+                      value="Hard" 
+                      checked={item.difficulty === "Hard"}
+                      onChange={(e) => updateItem(item.id, "difficulty", e.target.value)}
+                    />
+                    <label className="text-red-600 font-semibold">Hard</label>
+                  </div>
                 </>
               )}
               <div className="flex justify-between items-center">
