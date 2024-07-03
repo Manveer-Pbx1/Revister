@@ -3,6 +3,7 @@ import { CiCirclePlus } from "react-icons/ci";
 
 export default function List() {
   const [items, setItems] = useState([]);
+  const [revisitCount, setRevisitCount] = useState(0);
   const [newItem, setNewItem] = useState({
     name: "",
     url: "",
@@ -48,6 +49,9 @@ export default function List() {
   };
 
   const getIcon = (url) => {
+    const parts = url.split("/");
+    const content = parts[4];
+    console.log(content);
     if (url.includes("leetcode")) {
       return (
         <img
@@ -56,13 +60,33 @@ export default function List() {
         />
       );
     } else if (url.includes("geeksforgeeks")) {
-      return <img src="https://img.icons8.com/color/480w/GeeksforGeeks.png" alt="GeeksforGeeks Icon"/>;
+      return (
+        <img
+          src="https://img.icons8.com/color/480w/GeeksforGeeks.png"
+          alt="GeeksforGeeks Icon"
+        />
+      );
     } else if (url.includes("codechef")) {
-      return <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyjpdztXS6-ldj8Njcp1wfOYNGka-Y-1OnBw&s" alt="CodeChef Icon"/>;
+      return (
+        <img
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyjpdztXS6-ldj8Njcp1wfOYNGka-Y-1OnBw&s"
+          alt="CodeChef Icon"
+        />
+      );
     } else if (url.includes("codeforces")) {
-      return <img src="https://cdn.iconscout.com/icon/free/png-256/free-code-forces-3629285-3031869.png?f=webp&w=256" alt="Codeforces Icon"/>;
+      return (
+        <img
+          src="https://cdn.iconscout.com/icon/free/png-256/free-code-forces-3629285-3031869.png?f=webp&w=256"
+          alt="Codeforces Icon"
+        />
+      );
     } else if (url.includes("hackerrank")) {
-      return <img src="https://upload.wikimedia.org/wikipedia/commons/6/65/HackerRank_logo.png" alt="HackerRank Icon"/>;
+      return (
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/6/65/HackerRank_logo.png"
+          alt="HackerRank Icon"
+        />
+      );
     }
     return null;
   };
@@ -86,23 +110,30 @@ export default function List() {
           !item.completed && (
             <div key={item.id} className="border-2 rounded p-2 w-[750px] mb-2">
               <div className="h-6 w-6 relative right-[25px] bottom-[25px] -rotate-45">
-                <a href={item.url} target="_blank" rel="noopener noreferrer">
+                <a href={item.url} target="_blank" rel="noopener noreferrer" onClick={()=> setRevisitCount(revisitCount + 1)}>
                   {getIcon(item.url)}
                 </a>
               </div>
               {item.saved ? (
                 <>
                   <p className="text-xl font-semibold -translate-y-7">
-                    {item.name}
-                    <span className={
-                      item.difficulty === "Easy" ? "text-green-600 px-4 text-sm bg-green-100 rounded-full p-2 ml-5" :
-                      item.difficulty === "Medium" ? "text-yellow-600 text-sm bg-yellow-100 rounded-full p-2 px-4 ml-5" :
-                      "text-red-600 text-sm bg-red-100 rounded-full p-2 px-4 ml-5"
-                    }>
+                    {item.url
+                      .split("/")[4]
+                      .split("-")
+                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                    <span
+                      className={
+                        item.difficulty === "Easy"
+                          ? "text-green-600 px-4 text-sm bg-green-100 rounded-full p-2 ml-5"
+                          : item.difficulty === "Medium"
+                          ? "text-yellow-600 text-sm bg-yellow-100 rounded-full p-2 px-4 ml-5"
+                          : "text-red-600 text-sm bg-red-100 rounded-full p-2 px-4 ml-5"
+                      }
+                    >
                       {item.difficulty}
                     </span>
                   </p>
-                  <p className="text-lg translate-x-2 h-[80px] overflow-y-auto ">
+                  <p className="text-md translate-x-2 h-[80px] overflow-y-auto ">
                     {item.notes}
                   </p>
                   <div className="relative float-right bottom-[125px]">
@@ -116,18 +147,10 @@ export default function List() {
                   <div className="text-gray-500 text-sm relative float-right">
                     {item.date.toLocaleString()}
                   </div>
+                    <span className="font-semibold text-orange-400">Revisits: {revisitCount}</span>
                 </>
               ) : (
                 <>
-                  <input
-                    type="text"
-                    value={item.name}
-                    onChange={(e) =>
-                      updateItem(item.id, "name", e.target.value)
-                    }
-                    placeholder="Name of the problem"
-                    className="border p-1 w-full mb-2"
-                  />
                   <input
                     type="text"
                     value={item.url}
@@ -144,31 +167,39 @@ export default function List() {
                     className="border p-1 w-full mb-2"
                   />
                   <div className="text-lg space-x-3 mb-2">
-                    <input 
-                      type="radio" 
-                      className="h-4 w-4" 
-                      name={`difficulty-${item.id}`} 
-                      value="Easy" 
+                    <input
+                      type="radio"
+                      className="h-4 w-4"
+                      name={`difficulty-${item.id}`}
+                      value="Easy"
                       checked={item.difficulty === "Easy"}
-                      onChange={(e) => updateItem(item.id, "difficulty", e.target.value)}
+                      onChange={(e) =>
+                        updateItem(item.id, "difficulty", e.target.value)
+                      }
                     />
                     <label className="text-green-600 font-semibold">Easy</label>
-                    <input 
-                      type="radio" 
-                      className="h-4 w-4" 
-                      name={`difficulty-${item.id}`} 
-                      value="Medium" 
+                    <input
+                      type="radio"
+                      className="h-4 w-4"
+                      name={`difficulty-${item.id}`}
+                      value="Medium"
                       checked={item.difficulty === "Medium"}
-                      onChange={(e) => updateItem(item.id, "difficulty", e.target.value)}
+                      onChange={(e) =>
+                        updateItem(item.id, "difficulty", e.target.value)
+                      }
                     />
-                    <label className="text-yellow-600 font-semibold">Medium</label>
-                    <input 
-                      type="radio" 
-                      className="h-4 w-4" 
-                      name={`difficulty-${item.id}`} 
-                      value="Hard" 
+                    <label className="text-yellow-600 font-semibold">
+                      Medium
+                    </label>
+                    <input
+                      type="radio"
+                      className="h-4 w-4"
+                      name={`difficulty-${item.id}`}
+                      value="Hard"
                       checked={item.difficulty === "Hard"}
-                      onChange={(e) => updateItem(item.id, "difficulty", e.target.value)}
+                      onChange={(e) =>
+                        updateItem(item.id, "difficulty", e.target.value)
+                      }
                     />
                     <label className="text-red-600 font-semibold">Hard</label>
                   </div>
