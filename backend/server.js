@@ -17,14 +17,14 @@ app.post("/send-notification", (req, res) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "revistergetconsistent@gmail.com",
-      pass: "aspy lwxf xsbd wcty",
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
   });
 
   // Define email options
   let mailOptions = {
-    from: "revistergetconsistent@gmail.com",
+    from: process.env.EMAIL_USER,
     to: email,
     subject: "Notification Setup",
     html: `<div style="padding: 24px">
