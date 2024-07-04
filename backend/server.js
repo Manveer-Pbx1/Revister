@@ -3,10 +3,10 @@ const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const schedule = require("node-schedule");
-
+const dotenv = require("dotenv");
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+dotenv.config();
 app.use(cors());
 app.use(bodyParser.json());
 
