@@ -10,7 +10,7 @@ dotenv.config();
 app.use(cors());
 app.use(bodyParser.json());
 
-app.post("/send-notification", (req, res) => {
+app.post("/send-notification", async (req, res) => {
   const { email, time } = req.body;
 
   // Configure the transport options
@@ -27,25 +27,23 @@ app.post("/send-notification", (req, res) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Notification Setup",
-    html: `<div style="padding: 24px">
-    <h1> Greetings from <strong><i>REVISTER</i></strong></h1>
+    html: `<div style="background-color: green">
+    <h1> Greetings from <strong><italic>REVISTER</italic></strong></h1>
     <p>Time to revisit those problems!</p>
-            </div>`,
+  </div>`,
   };
 
-  // Schedule the email
-  const date = new Date(time);
-  schedule.scheduleJob(date, async () => {
-    try {
-      await transporter.sendMail(mailOptions);
-      console.log("Notification email sent");
-    } catch (error) {
-      console.error("Error sending email: ", error);
-    }
-  });
-
-  res.status(200).send("Notification email scheduled");
+  try {
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent: ' + info.response); // Log the response
+    res.status(200).send("Notification email sent");
+  } catch (error) {
+    console.error("Error sending email: ", error); // Log the error
+    res.status(500).send("Error sending email: " + error.message);
+  }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
