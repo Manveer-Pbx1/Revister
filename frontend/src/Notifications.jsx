@@ -25,7 +25,7 @@ export default function Notifications() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/send-notification", { email, time });
+      const response = await axios.post("https://revister-backend.onrender.com/send-notification", { email, time });
       alert(response.data);
       console.log("Req:", email, time);
     } catch (error) {
