@@ -28,14 +28,13 @@ app.post("/send-notification", (req, res) => {
     to: email,
     subject: "Time to REVISIT with REVISTER",
     html: `
-    <body style = "background-image: url("https://images.pexels.com/photos/330771/pexels-photo-330771.jpeg?auto=compress&cs=tinysrgb&w=600")">
     <div style="padding: 24px">
-    <h1>Time to get <strong>CONSISTENT</strong> and <strong>DISCIPLINED.</strong></h1>
+    <h1>Time to get <strong><i>CONSISTENT</i></strong> and <strong><i>DISCIPLINED.</i></strong></h1>
     <br/>
+    <img src="https://images.pexels.com/photos/330771/pexels-photo-330771.jpeg?auto=compress&cs=tinysrgb&w=600" style = "height: 300px; width: 100%; background-size: cover; background-position: center; background-repeat: no-repeat;"/>
 
-    <a href = "https://revister-getconsistent.vercel.app/"> Revist here </a>
+    <a href = "https://revister-getconsistent.vercel.app/"> Revisit problems </a>
             </div>
-            </body>
             `,
   };
 
