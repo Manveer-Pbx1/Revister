@@ -27,10 +27,19 @@ app.post("/send-notification", (req, res) => {
     from: "revistergetconsistent@gmail.com",
     to: email,
     subject: "Notification Setup",
-    html: `<div style="padding: 24px">
+    html: `
+    <body style = "background-image: url("https://www.pexels.com/photo/silhouette-of-trees-and-mountain-under-blue-starry-sky-1175136/")>
+    <div style="padding: 24px">
     <h1> Greetings from <strong><i>REVISTER</i></strong></h1>
-    <p>Time to revisit those problems!</p>
-            </div>`,
+    <p>Time to get <strong>CONSISTENT</strong> and <strong>DISCIPLINED</strong></p>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <a href = "https://revister-getconsistent.vercel.app/"> Revist here </a>
+            </div>
+            </body>`,
   };
 
   // Schedule the email
