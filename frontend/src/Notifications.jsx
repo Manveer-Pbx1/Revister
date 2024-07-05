@@ -39,11 +39,11 @@ export default function Notifications() {
 
   return (
     <div>
-      <h1 className="text-center font-semibold text-2xl text-gray-700">
+      <h1 className=" text-center font-semibold text-2xl text-gray-700">
         Get Started with setting up Notifications.
       </h1>
       <form onSubmit={handleSubmit} className="grid grid-rows-3 gap-4">
-        <div className="flex justify-center items-center ml-auto mr-auto w-[500px] text-center">
+        <div className=" list flex justify-center items-center ml-auto mr-auto w-[500px] text-center">
           <input
             type="email"
             placeholder="Enter your email"
