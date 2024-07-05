@@ -5,7 +5,7 @@ const cors = require("cors");
 const schedule = require("node-schedule");
 const dotenv = require("dotenv");
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 dotenv.config();
 app.use(cors());
 app.use(bodyParser.json());
@@ -17,14 +17,14 @@ app.post("/send-notification", (req, res) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: "revistergetconsistent@gmail.com",
+      pass: "aspy lwxf xsbd wcty",
     },
   });
 
   // Define email options
   let mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: "revistergetconsistent@gmail.com",
     to: email,
     subject: "Notification Setup",
     html: `<div style="padding: 24px">
