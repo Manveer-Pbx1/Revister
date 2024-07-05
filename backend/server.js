@@ -16,6 +16,8 @@ app.post("/send-notification", (req, res) => {
   // Configure the transport options
   let transporter = nodemailer.createTransport({
     service: "gmail",
+    port: 465,
+    secure: true,
     auth: {
       user: "revistergetconsistent@gmail.com",
       pass: "aspy lwxf xsbd wcty",
