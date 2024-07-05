@@ -32,7 +32,7 @@ app.post("/send-notification", (req, res) => {
     <h1> Greetings from <strong><i>REVISTER</i></strong></h1>
     <p>Time to get <strong>CONSISTENT</strong> and <strong>DISCIPLINED</strong></p>
     <br/>
-    <img src="https://www.pexels.com/photo/silhouette-of-trees-and-mountain-under-blue-starry-sky-1175136/"/>
+    <img src="https://images.pexels.com/photos/1175136/pexels-photo-1175136.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"/>
 
     <a href = "https://revister-getconsistent.vercel.app/"> Revist here </a>
             </div>
