@@ -189,7 +189,7 @@ export default function List() {
                       {new Date(item.date).toLocaleString()}
                     </div>
                     <span className="font-semibold text-orange-400">
-                      Revisits: { }
+                      Revisits: {revisitCount}
                     </span>
                   </>
                 ) : (
