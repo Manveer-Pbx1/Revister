@@ -1,3 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* base.css */
+
+.revister__heading {
+    padding: 65px;
+    font-size: 5rem;
+    text-align: center;
+  }
+  
+  .revister__heading span {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #22c55e; /* Tailwind green-600 */
+  }
+  
+  @media (max-width: 768px) {
+    .revister__heading {
+      padding: 20px;
+      font-size: 3rem;
+    }
+  
+    .revister__heading span {
+      font-size: 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .revister__heading {
+      padding: 10px;
+      font-size: 2rem;
+    }
+  
+    .revister__heading span {
+      font-size: 0.875rem;
+    }
+
+    .remind__me{
+        position: absolute;
+        right: 12;
+    }
+    .list{
+        width: 300px;
+        margin-right: 10%;
+        margin-top: 10%;
+        font-size: 16px;
+    }
+  }
+
+  
+  .remind__me {
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+  }

@@ -120,15 +120,11 @@ export default function List() {
       <Header />
       <div className="flex justify-center items-center flex-col">
         {!initialDivHidden && items.length === 0 && (
-          <div className="border-2 text-center rounded-full w-[750px] p-2 mb-4">
+          <div className="list border-2 text-center rounded-full w-[750px] p-2 mb-4">
             <CiCirclePlus
               className="text-4xl text-red-500 ml-auto mr-auto cursor-pointer hover:text-red-400"
               onClick={addItem}
             />
-            <br />
-            <p className="text-2xl text-blue-400 font-semibold">
-              Go ahead! Add a Listing.
-            </p>
           </div>
         )}
         {items.map(
@@ -136,7 +132,7 @@ export default function List() {
             !item.completed && (
               <div
                 key={item.id}
-                className="border-2 rounded p-2 w-[750px] mb-2"
+                className="list border-2 rounded p-2 w-[750px] mb-2"
               >
                 <div className="h-6 w-6 relative right-[25px] bottom-[25px] -rotate-45">
                   <a
