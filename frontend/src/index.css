@@ -39,7 +39,14 @@
 
     .remind__me{
         position: absolute;
-        right: 12;
+        top: 10%;
+        right: 12px;
+    }
+    .icon{
+        font-size:16px;
+        position: absolute;
+        top: 1.3%;
+        right: 97%;
     }
     .list{
         width: 300px;
@@ -51,8 +58,7 @@
 
   
   .remind__me {
-    font-size: 1.25rem;
+    font-size: 16px;
     font-weight: 600;
     display: inline-flex;
-    align-items: center;
   }

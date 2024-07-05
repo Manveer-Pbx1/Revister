@@ -11,7 +11,7 @@ export default function Header() {
       </h1>
       <Link to='/notifications'>
       <button className="remind__me absolute float-right bottom-[75px] right-4 text-xl text-blue-400 font-semibold ">
-        <CiBellOn className=" text-4xl text-black"/>Remind Me!
+        <CiBellOn className="icon text-4xl text-black"/>Remind Me!
       </button>
       </Link>
     </div>
