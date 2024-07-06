@@ -23,9 +23,9 @@ export default function Notifications() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     try {
-      const response = await axios.post("https://revister-getconsistent.vercel.app/send-notification", { email, time });
+      const response = await axios.post("https://revister-1.onrender.com/send-notification", { email, time });
       alert(response.data);
       console.log("Req:", email, time);
     } catch (error) {
