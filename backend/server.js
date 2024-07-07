@@ -37,14 +37,29 @@ app.post("/send-notification", (req, res) => {
             `,
   };
 
-  // Directly send email without scheduling for testing
-transporter.sendMail(mailOptions, (error, info) => {
-  if (error) {
-    console.error("Error sending email immediately:", error);
-  } else {
-    console.log("Email sent:", info.response);
+  const date = new Date(time);
+  console.log("Converted date:", date);
+
+  // Check if the date is valid
+  if (isNaN(date.getTime())) {
+    console.error("Invalid date provided:", time);
+    return res.status(400).send("Invalid date");
   }
-});
+
+  // Schedule the email
+  const job = schedule.scheduleJob(date, async () => {
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("Notification email sent to:", email);
+    } catch (error) {
+      console.error("Error sending scheduled email:", error);
+    }
+  });
+
+  // Log the scheduled job details
+  console.log("Scheduled job:", job);
+
+  res.status(200).send("Notification email scheduled");
 
 });
 
