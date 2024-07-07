@@ -37,18 +37,15 @@ app.post("/send-notification", (req, res) => {
             `,
   };
 
-  // Schedule the email
-  const date = new Date(time);
-  schedule.scheduleJob(date, async () => {
-    try {
-      await transporter.sendMail(mailOptions);
-      console.log("Notification email sent", mailOptions);
-    } catch (error) {
-      console.error("Error sending email: ", error);
-    }
-  });
+  // Directly send email without scheduling for testing
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    console.error("Error sending email immediately:", error);
+  } else {
+    console.log("Email sent:", info.response);
+  }
+});
 
-  res.status(200).send("Notification email scheduled");
 });
 
 app.listen(PORT, () => {
