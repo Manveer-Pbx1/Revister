@@ -38,16 +38,22 @@ app.post("/send-notification", (req, res) => {
   };
 
   const date = new Date(time);
-  console.log("Converted date:", date);
+  console.log("Converted date (server local time):", date);
 
-  // Check if the date is valid
   if (isNaN(date.getTime())) {
     console.error("Invalid date provided:", time);
     return res.status(400).send("Invalid date");
   }
 
-  // Schedule the email
+  const now = new Date();
+  console.log("Current server time:", now);
+  if (date <= now) {
+    console.error("Scheduled time is in the past:", date);
+    return res.status(400).send("Scheduled time must be in the future");
+  }
+
   const job = schedule.scheduleJob(date, async () => {
+    console.log("Scheduled job triggered at:", new Date());
     try {
       await transporter.sendMail(mailOptions);
       console.log("Notification email sent to:", email);
@@ -56,8 +62,8 @@ app.post("/send-notification", (req, res) => {
     }
   });
 
-  // Log the scheduled job details
   console.log("Scheduled job:", job);
+
 
   res.status(200).send("Notification email scheduled");
 
