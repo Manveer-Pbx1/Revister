@@ -16,7 +16,6 @@ export default function List() {
   const [initialDivHidden, setInitialDivHidden] = useState(false);
   const [editingItemId, setEditingItemId] = useState(null);
 
-  // Load saved items and revisits from local storage when the component mounts
   useEffect(() => {
     const savedItems = localStorage.getItem("savedListing");
     const savedRevisits = localStorage.getItem("revisits");
