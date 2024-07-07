@@ -24,18 +24,20 @@ export default function Notifications() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const isoTime = new Date(time).toISOString();
     try {
-      const response = await axios.post("https://revister-1.onrender.com/send-notification", { email, time });
+      const response = await axios.post("https://revister-1.onrender.com/send-notification", { email, time: isoTime });
       alert(response.data);
-      console.log("Req:", email, time);
+      console.log("Req:", email, isoTime);
     } catch (error) {
       alert("Error sending notification: " + error.message);
     }
-
+  
     const message = `Notification set for ${email} at ${time}`;
     setNotificationMessage(message);
     localStorage.setItem("notificationMessage", message);
   };
+  
 
   return (
     <div>
