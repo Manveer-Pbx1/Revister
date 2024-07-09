@@ -10,6 +10,14 @@ dotenv.config();
 app.use(cors());
 app.use(bodyParser.json());
 
+app.post("/save-url", (req, res) => {
+  const { url, notes } = req.body;
+  console.log("URL and notes received:", url, notes);
+  res.status(200).send({ message: "URL and notes saved successfully" });
+});
+
+
+
 app.post("/send-notification", (req, res) => {
   const { email, time } = req.body;
 
