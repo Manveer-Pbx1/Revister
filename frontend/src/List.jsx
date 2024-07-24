@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { CiCirclePlus } from "react-icons/ci";
 import Header from "./Header";
 
@@ -16,19 +17,43 @@ export default function List() {
   const [initialDivHidden, setInitialDivHidden] = useState(false);
   const [editingItemId, setEditingItemId] = useState(null);
 
-  // Load saved items from local storage when the component mounts
+  // Load saved items from backend when the component mounts
   useEffect(() => {
-    const savedItems = localStorage.getItem("savedListing");
-    
-    if (savedItems) {
+    async function fetchSavedItems() {
       try {
-        const parsedItems = JSON.parse(savedItems);
-        setItems(parsedItems);
+        const response = await axios.get("http://localhost:5000/get-saved-items");
+        setItems(response.data);
       } catch (error) {
-        console.error("Failed to parse items from local storage", error);
+        console.error("Failed to fetch saved items:", error);
       }
     }
+
+    fetchSavedItems();
   }, []);
+
+  useEffect(() => {
+    async function saveNewItemToBackend() {
+      try {
+        await axios.post("http://localhost:5000/save-item", newItem);
+        console.log("New item saved to backend");
+      } catch (error) {
+        console.error("Error saving new item:", error);
+      }
+    }
+
+    if (newItem.url && newItem.notes && newItem.difficulty) {
+      saveNewItemToBackend();
+      newItem.saved = true;
+    }
+  }, [newItem]); 
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewItem((prevItem) => ({
+      ...prevItem,
+      [name]: value,
+    }));
+  };
 
   const addItem = () => {
     const date = new Date();
@@ -44,7 +69,6 @@ export default function List() {
       revisitCount: 0,
     });
     setInitialDivHidden(true);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
   };
 
   const updateItem = (id, key, value) => {
@@ -52,7 +76,6 @@ export default function List() {
       item.id === id ? { ...item, [key]: value } : item
     );
     setItems(updatedItems);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
   };
 
   const toggleCompletion = (id) => {
@@ -60,7 +83,6 @@ export default function List() {
       item.id === id ? { ...item, completed: !item.completed } : item
     );
     setItems(updatedItems);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
   };
 
   const saveItem = (id) => {
@@ -68,7 +90,6 @@ export default function List() {
       item.id === id ? { ...item, saved: true } : item
     );
     setItems(updatedItems);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
   };
 
   const startEditing = (id) => {
@@ -89,7 +110,6 @@ export default function List() {
       item.id === id ? { ...item, revisitCount: (item.revisitCount || 0) + 1 } : item
     );
     setItems(updatedItems);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
   };
 
   const getIcon = (url) => {
@@ -131,6 +151,7 @@ export default function List() {
     }
     return null;
   };
+
 
   return (
     <>
@@ -198,7 +219,7 @@ export default function List() {
                       {new Date(item.date).toLocaleString()}
                     </div>
                     <span className="font-semibold text-orange-400">
-                      Revisits:  {0 || item.revisitCount}
+                      Revisits: {0 || item.revisitCount}
                     </span>
                     <button
                       onClick={() => startEditing(item.id)}
@@ -211,6 +232,7 @@ export default function List() {
                   <>
                     <input
                       type="text"
+                      name="url"
                       value={item.url}
                       onChange={(e) =>
                         updateItem(item.id, "url", e.target.value)
@@ -219,6 +241,7 @@ export default function List() {
                       className="border p-1 w-full mb-2"
                     />
                     <textarea
+                      name="notes"
                       value={item.notes}
                       onChange={(e) =>
                         updateItem(item.id, "notes", e.target.value)
@@ -237,9 +260,7 @@ export default function List() {
                           updateItem(item.id, "difficulty", e.target.value)
                         }
                       />
-                      <label className="text-green-600 font-semibold">
-                        Easy
-                      </label>
+                      <label className="text-green-600 font-semibold">Easy</label>
                       <input
                         type="radio"
                         className="h-4 w-4"
