@@ -13,29 +13,57 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
+// Save URL and notes endpoint
 app.post("/save-url", (req, res) => {
   const { url, notes } = req.body;
   console.log("URL and notes received:", url, notes);
   res.status(200).send({ message: "URL and notes saved successfully" });
 });
 
+// Send notification endpoint
 app.post("/send-notification", async (req, res) => {
   const { email, time } = req.body;
 
+  // Validate email and time
   if (!email || !time) {
     return res.status(400).send("Email and time are required");
   }
 
+  // Convert time to UTC
+  const userDate = new Date(time);
+  const utcDate = new Date(Date.UTC(
+    userDate.getUTCFullYear(),
+    userDate.getUTCMonth(),
+    userDate.getUTCDate(),
+    userDate.getUTCHours(),
+    userDate.getUTCMinutes()
+  ));
+
+  console.log("Converted UTC date:", utcDate);
+
+  if (isNaN(utcDate.getTime())) {
+    console.error("Invalid date provided:", time);
+    return res.status(400).send("Invalid date format");
+  }
+
+  const now = new Date();
+  if (utcDate <= now) {
+    console.error("Scheduled time is in the past:", utcDate);
+    return res.status(400).send("Scheduled time must be in the future");
+  }
+
+  // Configure the transport options
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: 'revistergetconsistent@gmail.com',
-      pass: 'aspy lwxf xsbd wcty',
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
     },
   });
 
+  // Define email options
   const mailOptions = {
-    from: 'revistergetconsistent@gmail.com',
+    from: process.env.EMAIL,
     to: email,
     subject: "Time to REVISIT with REVISTER",
     html: `
@@ -47,22 +75,8 @@ app.post("/send-notification", async (req, res) => {
     `,
   };
 
-  const scheduleDate = new Date(time);
-  console.log("Converted date (server local time):", scheduleDate);
-
-  if (isNaN(scheduleDate.getTime())) {
-    console.error("Invalid date provided:", time);
-    return res.status(400).send("Invalid date format");
-  }
-
-  const now = new Date();
-  console.log("Current server time:", now);
-  if (scheduleDate <= now) {
-    console.error("Scheduled time is in the past:", scheduleDate);
-    return res.status(400).send("Scheduled time must be in the future");
-  }
-
-  schedule.scheduleJob(scheduleDate, async () => {
+  // Schedule the email
+  schedule.scheduleJob(utcDate, async () => {
     console.log("Scheduled job triggered at:", new Date());
     try {
       await transporter.sendMail(mailOptions);
@@ -72,7 +86,7 @@ app.post("/send-notification", async (req, res) => {
     }
   });
 
-  console.log("Notification email scheduled for:", scheduleDate);
+  console.log("Notification email scheduled for:", utcDate);
   res.status(200).send("Notification email scheduled");
 });
 
