@@ -162,8 +162,14 @@ export default function List() {
                   </a>
                 </div>
                 {item.saved && editingItemId !== item.id ? (
-                  <>
-                    <p className="text-xl font-semibold -translate-y-7">
+                  <a>
+                    <p className="text-xl font-semibold -translate-y-7 hover:text-[#246dad]">
+                    <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => incrementRevisitCount(item.id)}
+                  >
                       {item.url
                         .split("/")[4]
                         .split("-")
@@ -171,6 +177,7 @@ export default function List() {
                           (word) => word.charAt(0).toUpperCase() + word.slice(1)
                         )
                         .join(" ")}
+                        </a>
                       <span
                         className={
                           item.difficulty === "Easy"
@@ -183,7 +190,7 @@ export default function List() {
                         {item.difficulty}
                       </span>
                     </p>
-                    <p className="text-md translate-x-2 h-[80px] overflow-y-auto ">
+                    <p className="text-sm translate-x-2 h-[80px] overflow-y-auto text-gray-700 font-bold font-sans">
                       {item.notes}
                     </p>
                     <div className="relative float-right bottom-[125px]">
@@ -202,11 +209,11 @@ export default function List() {
                     </span>
                     <button
                       onClick={() => startEditing(item.id)}
-                      className="bg-yellow-500 text-white px-2 py-1 rounded ml-2"
+                      className="bg-yellow-500 text-white px-2 py-1 font-bold rounded ml-2"
                     >
                       Edit
                     </button>
-                  </>
+                  </a>
                 ) : (
                   <>
                     <input
@@ -269,7 +276,7 @@ export default function List() {
                       {!item.saved && (
                         <button
                           onClick={() => saveChanges(item.id)}
-                          className="bg-blue-500 text-white px-2 py-1 rounded"
+                          className="bg-blue-500 text-white px-2 py-1 rounded font-bold"
                         >
                           Save
                         </button>
