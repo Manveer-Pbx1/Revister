@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import Header from "./Header";
+import {
+  getItemsFromStorage,
+  addItemToStorage,
+  updateItemInStorage,
+  toggleItemCompletion,
+  incrementRevisitCount as incrementRevisitCountInStorage
+} from "./utils/localStorage";
+import { syncWithExtension } from "./utils/extensionSync";
 
 export default function List() {
   const [items, setItems] = useState([]);
@@ -15,25 +23,58 @@ export default function List() {
   });
   const [initialDivHidden, setInitialDivHidden] = useState(false);
   const [editingItemId, setEditingItemId] = useState(null);
+  const [showNewItemForm, setShowNewItemForm] = useState(false);
 
-  // Load saved items from local storage when the component mounts
   useEffect(() => {
-    const savedItems = localStorage.getItem("savedListing");
+    fetchItems();
     
-    if (savedItems) {
-      try {
-        const parsedItems = JSON.parse(savedItems);
-        setItems(parsedItems);
-      } catch (error) {
-        console.error("Failed to parse items from local storage", error);
-      }
-    }
+    // Listen for storage events (from extension or other tabs)
+    const handleStorageChange = () => {
+      fetchItems();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
-  const addItem = () => {
-    const date = new Date();
-    const updatedItems = [...items, { ...newItem, id: Date.now(), date: date }];
-    setItems(updatedItems);
+  const fetchItems = async () => {
+    try {
+      // First try to sync with extension
+      const syncedItems = await syncWithExtension();
+      
+      if (syncedItems) {
+        // Sort by date descending (newest first)
+        const sortedItems = syncedItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setItems(sortedItems);
+      } else {
+        // Fallback to localStorage only
+        const storedItems = getItemsFromStorage();
+        const sortedItems = storedItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setItems(sortedItems);
+      }
+    } catch (error) {
+      console.error("Error fetching items:", error);
+      // Fallback to localStorage
+      const storedItems = getItemsFromStorage();
+      const sortedItems = storedItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setItems(sortedItems);
+    }
+  };
+
+  const handleNewItemChange = (key, value) => {
+    setNewItem({ ...newItem, [key]: value });
+  };
+
+  const showAddForm = () => {
+    setShowNewItemForm(true);
+    setInitialDivHidden(true);
+  };
+
+  const cancelAddForm = () => {
+    setShowNewItemForm(false);
     setNewItem({
       name: "",
       url: "",
@@ -43,32 +84,70 @@ export default function List() {
       saved: false,
       revisitCount: 0,
     });
-    setInitialDivHidden(true);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
+    if (items.length === 0) {
+      setInitialDivHidden(false);
+    }
+  };
+
+  const addItem = () => {
+    try {
+      if (!newItem.url || !newItem.notes || !newItem.difficulty) {
+        alert("URL, notes, and difficulty are required");
+        return;
+      }
+
+      const itemToAdd = { ...newItem, saved: true };
+      const savedItem = addItemToStorage(itemToAdd);
+      setItems([savedItem, ...items]);
+      setNewItem({
+        name: "",
+        url: "",
+        notes: "",
+        difficulty: "",
+        completed: false,
+        saved: false,
+        revisitCount: 0,
+      });
+      setShowNewItemForm(false);
+    } catch (error) {
+      console.error("Error adding item:", error);
+      alert("Error adding item: " + error.message);
+    }
   };
 
   const updateItem = (id, key, value) => {
-    const updatedItems = items.map((item) =>
-      item.id === id ? { ...item, [key]: value } : item
-    );
-    setItems(updatedItems);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
+    try {
+      const updates = { [key]: value };
+      updateItemInStorage(id, updates);
+      
+      setItems(items.map(item => 
+        item.id === id ? { ...item, [key]: value } : item
+      ));
+    } catch (error) {
+      console.error("Error updating item:", error);
+    }
   };
 
   const toggleCompletion = (id) => {
-    const updatedItems = items.map((item) =>
-      item.id === id ? { ...item, completed: !item.completed } : item
-    );
-    setItems(updatedItems);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
+    try {
+      const updatedItem = toggleItemCompletion(id);
+      setItems(items.map(item => 
+        item.id === id ? updatedItem : item
+      ));
+    } catch (error) {
+      console.error("Error toggling completion:", error);
+    }
   };
 
   const saveItem = (id) => {
-    const updatedItems = items.map((item) =>
-      item.id === id ? { ...item, saved: true } : item
-    );
-    setItems(updatedItems);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
+    try {
+      updateItemInStorage(id, { saved: true });
+      setItems(items.map(item => 
+        item.id === id ? { ...item, saved: true } : item
+      ));
+    } catch (error) {
+      console.error("Error saving item:", error);
+    }
   };
 
   const startEditing = (id) => {
@@ -85,11 +164,14 @@ export default function List() {
   };
 
   const incrementRevisitCount = (id) => {
-    const updatedItems = items.map((item) =>
-      item.id === id ? { ...item, revisitCount: (item.revisitCount || 0) + 1 } : item
-    );
-    setItems(updatedItems);
-    localStorage.setItem("savedListing", JSON.stringify(updatedItems));
+    try {
+      const updatedItem = incrementRevisitCountInStorage(id);
+      setItems(items.map(item => 
+        item.id === id ? updatedItem : item
+      ));
+    } catch (error) {
+      console.error("Error incrementing revisit count:", error);
+    }
   };
 
   const getIcon = (url) => {
@@ -140,10 +222,72 @@ export default function List() {
           <div className="list border-2 text-center rounded-full w-[750px] p-2 mb-4">
             <CiCirclePlus
               className="text-4xl text-red-500 ml-auto mr-auto cursor-pointer hover:text-red-400"
-              onClick={addItem}
+              onClick={showAddForm}
             />
           </div>
         )}
+
+        {showNewItemForm && (
+          <div className="list border-2 rounded p-2 w-[750px] mb-4">
+            <input
+              type="text"
+              value={newItem.url}
+              onChange={(e) => handleNewItemChange("url", e.target.value)}
+              placeholder="URL of the problem"
+              className="border p-1 w-full mb-2"
+            />
+            <textarea
+              value={newItem.notes}
+              onChange={(e) => handleNewItemChange("notes", e.target.value)}
+              placeholder="Notes"
+              className="border p-1 w-full mb-2"
+            />
+            <div className="text-lg space-x-3 mb-2">
+              <input
+                type="radio"
+                className="h-4 w-4"
+                name="difficulty-new"
+                value="Easy"
+                checked={newItem.difficulty === "Easy"}
+                onChange={(e) => handleNewItemChange("difficulty", e.target.value)}
+              />
+              <label className="text-green-600 font-semibold">Easy</label>
+              <input
+                type="radio"
+                className="h-4 w-4"
+                name="difficulty-new"
+                value="Medium"
+                checked={newItem.difficulty === "Medium"}
+                onChange={(e) => handleNewItemChange("difficulty", e.target.value)}
+              />
+              <label className="text-yellow-600 font-semibold">Medium</label>
+              <input
+                type="radio"
+                className="h-4 w-4"
+                name="difficulty-new"
+                value="Hard"
+                checked={newItem.difficulty === "Hard"}
+                onChange={(e) => handleNewItemChange("difficulty", e.target.value)}
+              />
+              <label className="text-red-600 font-semibold">Hard</label>
+            </div>
+            <div className="flex justify-between">
+              <button
+                onClick={addItem}
+                className="bg-green-500 text-white px-2 py-1 rounded"
+              >
+                Save
+              </button>
+              <button
+                onClick={cancelAddForm}
+                className="bg-red-500 text-white px-2 py-1 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
         {items.map(
           (item) =>
             !item.completed && (
@@ -170,13 +314,15 @@ export default function List() {
                     rel="noopener noreferrer"
                     onClick={() => incrementRevisitCount(item.id)}
                   >
-                      {item.url
-                        .split("/")[4]
-                        .split("-")
-                        .map(
-                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ")}
+                      {item.url && item.url.split("/")[4]
+                        ? item.url
+                            .split("/")[4]
+                            .split("-")
+                            .map(
+                              (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
+                        : "No Title"}
                         </a>
                       <span
                         className={
@@ -272,34 +418,30 @@ export default function List() {
                       />
                       <label className="text-red-600 font-semibold">Hard</label>
                     </div>
-                    <div className="flex justify-between items-center">
-                      {!item.saved && (
-                        <button
-                          onClick={() => saveChanges(item.id)}
-                          className="bg-blue-500 text-white px-2 py-1 rounded font-bold"
-                        >
-                          Save
-                        </button>
-                      )}
-                      {editingItemId === item.id && (
-                        <button
-                          onClick={cancelEditing}
-                          className="bg-red-500 text-white px-2 py-1 rounded ml-2"
-                        >
-                          Cancel
-                        </button>
-                      )}
+                    <div className="flex justify-between">
+                      <button
+                        onClick={() => saveChanges(item.id)}
+                        className="bg-green-500 text-white px-2 py-1 rounded"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={cancelEditing}
+                        className="bg-red-500 text-white px-2 py-1 rounded"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </>
                 )}
               </div>
             )
         )}
-        {items.length > 0 && (
-          <div className="border-2 rounded p-2 w-[750px] mb-4 text-center">
+        {items.length > 0 && !showNewItemForm && (
+          <div className="list border-2 text-center rounded-full w-[750px] p-2 mb-4">
             <CiCirclePlus
-              className="text-4xl text-red-500 ml-auto mr-auto cursor-pointer hover:text-red-400 mb-2"
-              onClick={addItem}
+              className="text-4xl text-red-500 ml-auto mr-auto cursor-pointer hover:text-red-400"
+              onClick={showAddForm}
             />
           </div>
         )}
