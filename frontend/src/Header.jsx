@@ -10,7 +10,7 @@ export default function Header() {
         <span className="text-xl font-semibold text-green-600 ">- Be Consistent. Be Disciplined. </span>
       </h1>
       <Link to='/notifications'>
-      <button className="remind__me absolute float-right bottom-[75px] right-4 text-xl text-blue-400 font-semibold ">
+      <button className="remind__me fixed float-right bottom-[45px] right-4 text-xl text-blue-400 font-semibold ">
         <CiBellOn className="icon text-4xl text-black"/>Remind Me!
       </button>
       </Link>
