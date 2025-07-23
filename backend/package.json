@@ -1,15 +1,22 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "supervisor server.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "create-db": "node src/config/create-db.js",
+    "migrate": "node src/config/db-migrate.js",
+    "migrate-to-localstorage": "node src/config/migrate-to-localStorage.js",
+    "test-connection": "node src/config/test-connection.js",
+    "pg-test": "node src/config/pg-test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -19,6 +26,12 @@
     "node-persist": "^4.0.1",
     "node-schedule": "^2.1.1",
     "nodemailer": "^6.9.14",
-    "supervisor": "^0.12.0"
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.35.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
   }
 }
